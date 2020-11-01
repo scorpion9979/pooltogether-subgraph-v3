@@ -107,7 +107,11 @@
         }
         externalErc721Awards {
           address
-          tokenIds
+          
+          tokens {
+            awarded
+            tokenId
+          }
         }
       }
     }

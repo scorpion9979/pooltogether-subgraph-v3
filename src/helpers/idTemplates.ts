@@ -1,4 +1,3 @@
-
 export function prizeId(prizePool: string, currentPrizeId: string): string {
   return prizePool + '-' + currentPrizeId
 }
@@ -13,6 +12,14 @@ export function creditRateId(prizePoolAddress: string, tokenAddress: string): st
 
 export function externalAwardId(prizeStrategyAddress: string, tokenAddress: string): string {
   return prizeStrategyAddress + '-' + tokenAddress
+}
+
+export function externalAwardTokenId(
+  prizeStrategyAddress: string,
+  tokenAddress: string,
+  tokenId: string
+): string {
+  return prizeStrategyAddress + '-' + tokenAddress + '-' + tokenId
 }
 
 export function dripTokenId(

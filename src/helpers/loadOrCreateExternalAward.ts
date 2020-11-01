@@ -1,11 +1,12 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, Bytes, log } from '@graphprotocol/graph-ts'
 
 import {
   ExternalErc20Award,
   ExternalErc721Award,
+  ExternalErc721AwardToken,
 } from '../../generated/schema'
 
-import { externalAwardId } from './idTemplates'
+import { externalAwardId, externalAwardTokenId } from './idTemplates'
 
 
 export function loadOrCreateExternalErc20Award(prizeStrategyAddress: string, tokenAddress: Address): ExternalErc20Award {
@@ -32,4 +33,32 @@ export function loadOrCreateExternalErc721Award(prizeStrategyAddress: string, to
   }
 
   return award as ExternalErc721Award
+}
+
+export function loadOrCreateExternalErc721AwardToken(
+  prizeStrategyAddress: string,
+  tokenAddress: Address,
+  tokenId: string
+): ExternalErc721AwardToken {
+  log.warning('prizeStrategyAddress {}', [prizeStrategyAddress])
+  log.warning('tokenAddress {}', [tokenAddress.toString()])
+  log.warning('tokenId {}', [tokenId])
+
+
+  const awardTokenId = externalAwardTokenId(
+    prizeStrategyAddress,
+    tokenAddress.toHex(),
+    tokenId
+  )
+  log.warning('awardTokenId {}', [awardTokenId])
+
+  let token = ExternalErc721AwardToken.load(awardTokenId)
+  if (!token) {
+    token = new ExternalErc721AwardToken(awardTokenId)
+    token.tokenId = Bytes.fromHexString(tokenId) as Bytes
+    token.awarded = false
+    token.save()
+  }
+
+  return token as ExternalErc721AwardToken
 }

@@ -24,6 +24,7 @@ import { loadOrCreateSingleRandomWinner } from './helpers/loadOrCreateSingleRand
 import {
   loadOrCreateExternalErc20Award,
   loadOrCreateExternalErc721Award,
+  loadOrCreateExternalErc721AwardToken,
 } from './helpers/loadOrCreateExternalAward'
 
 import { ONE } from './helpers/common'
@@ -109,10 +110,11 @@ export function handleExternalErc20AwardAdded(event: ExternalErc20AwardAdded): v
 }
 
 export function handleExternalErc20AwardRemoved(event: ExternalErc20AwardRemoved): void {
-  // TODO: implement this
-  // This is emitted when external rewards (other tokens, etc) are added to the prize
   log.warning('implement handleExternalErc20AwardRemoved', [])
 }
+
+let ZERO_BI = BigInt.fromI32(0)
+let ONE_BI = BigInt.fromI32(1)
 
 export function handleExternalErc721AwardAdded(event: ExternalErc721AwardAdded): void {
   const _prizeStrategyAddress = event.address.toHex()
@@ -120,19 +122,62 @@ export function handleExternalErc721AwardAdded(event: ExternalErc721AwardAdded):
 
   const externalAward = loadOrCreateExternalErc721Award(_prizeStrategyAddress, event.params.externalErc721)
 
-  externalAward.tokenIds = event.params.tokenIds
+  const tokenIds = event.params.tokenIds
+  // tokenIds.push(externalAward.id)
+  // _prizeStrategy.externalErc721Awards = externalErc721Awards
+
+  for (let i = ZERO_BI; i.lt(BigInt.fromI32(tokenIds.length)); i = i.plus(ONE_BI)) {
+    let tokenId = tokenIds[i.toI32()]
+    log.warning('tokenId {}', [tokenId.toString()])
+   
+    log.warning('event.address.toHex() {}', [event.address.toHex()])
+    log.warning('event.params.externalErc721.toHex() {}', [event.params.externalErc721.toHex()])
+
+    loadOrCreateExternalErc721AwardToken(
+      event.address.toHex(),
+      event.params.externalErc721,
+      tokenId.toString()
+    )
+    
+    // token.save()
+  }
+
+  // const externalErc721Awards = _prizeStrategy.externalErc721Awards
+  // externalErc721Awards.push(externalAward.id)
+  // _prizeStrategy.externalErc721Awards = externalErc721Awards
+
+  // event.params.tokenIds.forEach(tokenId => {
+  //   log.warning('event.address.toHex() {}', [event.address.toHex()])
+  //   log.warning('event.params.externalErc721.toHex() {}', [event.params.externalErc721.toHex()])
+  //   log.warning('tokenId {}', [tokenId.toString()])
+
+  //   const token = loadOrCreateExternalErc721AwardToken(
+  //     event.address.toHex(),
+  //     event.params.externalErc721,
+  //     tokenId.toString()
+  //   )
+  //   token.save()
+  // })
+
+  // const externalErc721Awards = _prizeStrategy.externalErc721Awards
+  // externalErc721Awards.push(externalAward.id)
+  // _prizeStrategy.externalErc721Awards = externalErc721Awards
+  
   externalAward.save()
 
+  // const externalErc721Awards = _prizeStrategy.externalErc721Awards
+  // externalErc721Awards.push(externalAward.id)
+  // _prizeStrategy.externalErc721Awards = externalErc721Awards
 
-  const externalErc721Awards = _prizeStrategy.externalErc721Awards
-  externalErc721Awards.push(externalAward.id)
-  _prizeStrategy.externalErc721Awards = externalErc721Awards
+  log.warning('externalAward.id {}', [externalAward.id])
+  // if (externalErc721Awards.length > 0) {
+  //   const firstItem = externalErc721Awards[0] as string
+  //   log.warning('externalErc721Awards {}', [firstItem])
+  // }
 
-  _prizeStrategy.save()
+  // _prizeStrategy.save()
 }
 
 export function handleExternalErc721AwardRemoved(event: ExternalErc721AwardRemoved): void {
-  // TODO: implement this
-  // This is emitted when external rewards (other tokens, etc) are added to the prize
   log.warning('implement handleExternalErc721AwardRemoved', [])
 }

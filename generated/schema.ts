@@ -720,24 +720,13 @@ export class SingleRandomWinner extends Entity {
     }
   }
 
-  get externalErc721Awards(): Array<string> | null {
+  get externalErc721Awards(): Array<string> {
     let value = this.get("externalErc721Awards");
-    if (value === null) {
-      return null;
-    } else {
-      return value.toStringArray();
-    }
+    return value.toStringArray();
   }
 
-  set externalErc721Awards(value: Array<string> | null) {
-    if (value === null) {
-      this.unset("externalErc721Awards");
-    } else {
-      this.set(
-        "externalErc721Awards",
-        Value.fromStringArray(value as Array<string>)
-      );
-    }
+  set externalErc721Awards(value: Array<string>) {
+    this.set("externalErc721Awards", Value.fromStringArray(value));
   }
 }
 
@@ -1126,6 +1115,23 @@ export class ExternalErc721Award extends Entity {
     this.set("id", Value.fromString(value));
   }
 
+  get singleRandomWinner(): string | null {
+    let value = this.get("singleRandomWinner");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set singleRandomWinner(value: string | null) {
+    if (value === null) {
+      this.unset("singleRandomWinner");
+    } else {
+      this.set("singleRandomWinner", Value.fromString(value as string));
+    }
+  }
+
   get address(): Bytes {
     let value = this.get("address");
     return value.toBytes();
@@ -1135,21 +1141,85 @@ export class ExternalErc721Award extends Entity {
     this.set("address", Value.fromBytes(value));
   }
 
-  get tokenIds(): Array<BigInt> | null {
-    let value = this.get("tokenIds");
+  get tokens(): Array<string> {
+    let value = this.get("tokens");
+    return value.toStringArray();
+  }
+
+  set tokens(value: Array<string>) {
+    this.set("tokens", Value.fromStringArray(value));
+  }
+}
+
+export class ExternalErc721AwardToken extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id !== null,
+      "Cannot save ExternalErc721AwardToken entity without an ID"
+    );
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save ExternalErc721AwardToken entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("ExternalErc721AwardToken", id.toString(), this);
+  }
+
+  static load(id: string): ExternalErc721AwardToken | null {
+    return store.get(
+      "ExternalErc721AwardToken",
+      id
+    ) as ExternalErc721AwardToken | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get externalErc721Award(): string | null {
+    let value = this.get("externalErc721Award");
     if (value === null) {
       return null;
     } else {
-      return value.toBigIntArray();
+      return value.toString();
     }
   }
 
-  set tokenIds(value: Array<BigInt> | null) {
+  set externalErc721Award(value: string | null) {
     if (value === null) {
-      this.unset("tokenIds");
+      this.unset("externalErc721Award");
     } else {
-      this.set("tokenIds", Value.fromBigIntArray(value as Array<BigInt>));
+      this.set("externalErc721Award", Value.fromString(value as string));
     }
+  }
+
+  get awarded(): boolean {
+    let value = this.get("awarded");
+    return value.toBoolean();
+  }
+
+  set awarded(value: boolean) {
+    this.set("awarded", Value.fromBoolean(value));
+  }
+
+  get tokenId(): Bytes {
+    let value = this.get("tokenId");
+    return value.toBytes();
+  }
+
+  set tokenId(value: Bytes) {
+    this.set("tokenId", Value.fromBytes(value));
   }
 }
 

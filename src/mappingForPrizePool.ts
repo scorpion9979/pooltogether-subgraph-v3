@@ -1,4 +1,4 @@
-import { Address, Bytes, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
 import {
   SingleRandomWinner,
   PrizeStrategy,
@@ -41,7 +41,10 @@ import { loadOrCreateSponsor } from './helpers/loadOrCreateSponsor'
 import { loadOrCreatePrizePool } from './helpers/loadOrCreatePrizePool'
 import { loadOrCreatePrizeStrategy } from './helpers/loadOrCreatePrizeStrategy'
 import { loadOrCreatePrizePoolCreditRate } from './helpers/loadOrCreatePrizePoolCreditRate'
-import { loadOrCreateExternalErc721Award } from './helpers/loadOrCreateExternalAward'
+import {
+  loadOrCreateExternalErc721Award,
+  loadOrCreateExternalErc721AwardToken,
+} from './helpers/loadOrCreateExternalAward'
 
 import { ZERO, ZERO_ADDRESS } from './helpers/common'
 
@@ -62,7 +65,7 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
 }
 
 export function handleControlledTokenAdded(event: ControlledTokenAdded): void {
-  log.warning('implement handleControlledTokenAdded!', [])
+  // log.warning('implement handleControlledTokenAdded!', [])
 }
 
 export function handleLiquidityCapSet(event: LiquidityCapSet): void {
@@ -137,30 +140,64 @@ export function handleAwardedExternalERC20(event: AwardedExternalERC20): void {
 
 // This is emitted when external rewards (nfts, etc)
   // are awarded
+
+// token 0xe9b4ad578264d16b55eb25e6eec1999306d912bd, data_source: PrizePool, runtime_host: 1 / 1, block_hash: 0xe3a51e25acd641db40cd4e10102dfce4a95312c33dae50776280bf6ac1ac44d3, block_number: 11102951
+
+// index - 1, data_source: PrizePool, runtime_host: 1 / 1, block_hash: 0xe3a51e25acd641db40cd4e10102dfce4a95312c33dae50776280bf6ac1ac44d3, block_number: 11102951
+
+// externalAward.id 0x029a9efdcdaac9e1f81a0498e8fd065ec500705b - 0xe9b4ad578264d16b55eb25e6eec1999306d912bd, data_source: SingleRandomWinner, runtime_host: 1 / 1, block_hash: 0xb16ee16ee142d02111329ec9c731e713a5df85b65353c4035f6733dde61f660b, block_number: 11102919
+
+let ZERO_BI = BigInt.fromI32(0)
+let ONE_BI = BigInt.fromI32(1)
+
 export function handleAwardedExternalERC721(event: AwardedExternalERC721): void {
-  log.warning('implement handleAwardedExternalERC721', [])
+  log.warning('handleAwardedExternalERC721', [])
 
   const _prizePool = loadOrCreatePrizePool(event.address)
 
   const _prizeStrategyId = _prizePool.prizeStrategy
   const _prizeStrategy = SingleRandomWinner.load(_prizeStrategyId)
 
-  // address indexed winner,
-  //   address indexed token,
-  //     uint256[] tokenIds
-
   const externalAward = loadOrCreateExternalErc721Award(
     _prizePool.prizeStrategy,
     event.params.token
   )
 
-  const externalErc721Awards = _prizeStrategy.externalErc721Awards
-  const index = externalErc721Awards.indexOf(externalAward.id, 0);
-  if (index > -1) {
-    externalErc721Awards.splice(index, 1);
+  const tokens = externalAward.tokens
+  log.warning('tokens {}', [tokens.toString()])
+
+  for (let i = ZERO_BI; i.lt(BigInt.fromI32(tokens.length)); i = i.plus(ONE_BI)) {
+    let tt = tokens[i.toI32()]
+
+    log.warning('tt {}', [tt])
+  
+    const _prizePool = loadOrCreatePrizePool(event.address)
+    
+    const token = loadOrCreateExternalErc721AwardToken(
+      _prizePool.prizeStrategy,
+      event.params.token,
+      tt
+    )
+
+    token.awarded = true
+
+    token.save()
   }
-  // delete externalErc721Awards[externalAward.id]
-  _prizeStrategy.externalErc721Awards = externalErc721Awards
+  externalAward.save()
+  
+  // event.params.tokenIds
+  // log.warning('externalAward id {}', [externalAward.id.toString()])
+  // log.warning('token {}', [event.params.token.toHexString()])
+
+  // const externalErc721Awards = _prizeStrategy.externalErc721Awards
+  // const index = externalErc721Awards.indexOf(externalAward.id, 0);
+  // log.warning('index {}', [index.toString()])
+  // if (index > -1) {
+  //   log.warning('splicing', [])
+  //   externalErc721Awards.splice(index, 1);
+  // }
+  // // delete externalErc721Awards[externalAward.id]
+  // _prizeStrategy.externalErc721Awards = externalErc721Awards
 
   _prizeStrategy.save()
 }
