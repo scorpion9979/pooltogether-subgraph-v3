@@ -17,7 +17,7 @@ export function loadOrCreateExternalErc20Award(prizeStrategyAddress: string, tok
 
   let award = SingleRandomWinnerExternalErc20Award.load(awardId)
   if (!award) {
-    log.warning("creating an externalErc20 entity ",[])
+    log.warning("creating an externalErc20 entity ",[awardId])
     award = new SingleRandomWinnerExternalErc20Award(awardId)
     award.prizeStrategy = prizeStrategyAddress
     award.address = tokenAddress
