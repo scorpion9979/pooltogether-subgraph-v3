@@ -21,6 +21,7 @@ export function loadOrCreateAccount(
 
   if (!account) {
     account = new Account(address.toHex())
+    account.referrers = []
     account.save()
   }
 

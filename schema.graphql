@@ -213,12 +213,15 @@ type PrizePoolAccount @entity{
 
 type Account @entity {
   id: ID!
-
+  referrers: [Referrer]!
   prizePoolAccounts: [PrizePoolAccount!]! @derivedFrom(field: "account")
   controlledTokenBalances: [ControlledTokenBalance!] @derivedFrom(field: "account")
 }
 
-
+type Referrer @entity {
+  id: ID!
+  accounts: [Account!]!
+}
 
 # ID: `${prizePool.address}-${controlledToken.address}`
 # dynamically generated type, not mapped to a specific contract

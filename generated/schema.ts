@@ -1657,6 +1657,15 @@ export class Account extends Entity {
     this.set("id", Value.fromString(value));
   }
 
+  get referrers(): Array<string | null> {
+    let value = this.get("referrers");
+    return value.toStringArray();
+  }
+
+  set referrers(value: Array<string | null>) {
+    this.set("referrers", Value.fromStringArray(value));
+  }
+
   get prizePoolAccounts(): Array<string> {
     let value = this.get("prizePoolAccounts");
     return value.toStringArray();
@@ -1684,6 +1693,46 @@ export class Account extends Entity {
         Value.fromStringArray(value as Array<string>)
       );
     }
+  }
+}
+
+export class Referrer extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Referrer entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Referrer entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Referrer", id.toString(), this);
+  }
+
+  static load(id: string): Referrer | null {
+    return store.get("Referrer", id) as Referrer | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get accounts(): Array<string> {
+    let value = this.get("accounts");
+    return value.toStringArray();
+  }
+
+  set accounts(value: Array<string>) {
+    this.set("accounts", Value.fromStringArray(value));
   }
 }
 
