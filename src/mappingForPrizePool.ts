@@ -210,5 +210,5 @@ export function handleTimelockDeposited(event: TimelockDeposited): void {
 }
 
 export function handleDeposited(event: Deposited):void {
-  loadOrCreatePrizePoolAccount(event.address, event.params.to.toHex())
+  loadOrCreatePrizePoolAccount(event.address, event.params.to.toHex(), event.params.referrer.toHex())
 }
